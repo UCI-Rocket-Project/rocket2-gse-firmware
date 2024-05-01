@@ -175,14 +175,14 @@ int main(void) {
             newCommand = false;
 
             solenoidState0 = (int)(command.solenoidStateGn2Fill);
-            solenoidState1 = (int)(!command.solenoidStateGn2Vent);
+            solenoidState1 = (int)(command.solenoidStateGn2Vent);
             solenoidState2 = (int)(command.solenoidStateMvasFill);
-            solenoidState3 = (int)(!command.solenoidStateMvasVent);
+            solenoidState3 = (int)(command.solenoidStateMvasVent);
             solenoidState4 = (int)(command.solenoidStateMvas);
             solenoidState5 = (int)(command.solenoidStateLoxFill);
-            solenoidState6 = (int)(command.solenoidStateLoxVent);
+            solenoidState6 = (int)(!command.solenoidStateLoxVent);
             solenoidState7 = (int)(command.solenoidStateLngFill);
-            solenoidState8 = (int)(command.solenoidStateLngVent);
+            solenoidState8 = (int)(!command.solenoidStateLngVent);
             igniterState0 = (int)command.igniter0Fire;
             igniterState1 = (int)command.igniter1Fire;
             alarmState = (int)command.alarm;
@@ -190,14 +190,14 @@ int main(void) {
 
         // internal states feedback
         data.solenoidInternalStateGn2Fill = (bool)solenoidState0;
-        data.solenoidInternalStateGn2Vent = !(bool)solenoidState1;
+        data.solenoidInternalStateGn2Vent = (bool)solenoidState1;
         data.solenoidInternalStateMvasFill = (bool)solenoidState2;
-        data.solenoidInternalStateMvasVent = !(bool)solenoidState3;
+        data.solenoidInternalStateMvasVent = (bool)solenoidState3;
         data.solenoidInternalStateMvas = (bool)solenoidState4;
         data.solenoidInternalStateLoxFill = (bool)solenoidState5;
-        data.solenoidInternalStateLoxVent = (bool)solenoidState6;
+        data.solenoidInternalStateLoxVent = !(bool)solenoidState6;
         data.solenoidInternalStateLngFill = (bool)solenoidState7;
-        data.solenoidInternalStateLngVent = (bool)solenoidState8;
+        data.solenoidInternalStateLngVent = !(bool)solenoidState8;
         data.igniterInternalState0 = (bool)igniterState0;
         data.igniterInternalState1 = (bool)igniterState1;
         data.alarmInternalState = (bool)alarmState;
