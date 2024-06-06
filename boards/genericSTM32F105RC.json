@@ -13,7 +13,13 @@
         "openocd_target": "stm32f1x",
         "svd_path": "STM32F105xx.svd"
     },
-    "frameworks": ["arduino", "cmsis", "mbed", "libopencm3", "stm32cube"],
+    "frameworks": [
+        "arduino",
+        "cmsis",
+        "mbed",
+        "libopencm3",
+        "stm32cube"
+    ],
     "name": "STM32F105RC (64k RAM. 256k Flash)",
     "upload": {
         "disable_flushing": false,
