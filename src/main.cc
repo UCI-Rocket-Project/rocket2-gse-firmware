@@ -181,8 +181,8 @@ int main(void) {
             solenoidState4 = (int)(command.solenoidStateMvasVent);
             solenoidState5 = (int)(command.solenoidStateMvasOpen);
             solenoidState6 = (int)(command.solenoidStateMvasClose);
-            solenoidState7 = (int)(!command.solenoidStateLoxVent);
-            solenoidState8 = (int)(!command.solenoidStateLngVent);
+            solenoidState7 = (int)(command.solenoidStateLoxVent);
+            solenoidState8 = (int)(command.solenoidStateLngVent);
             igniterState0 = (int)command.igniter0Fire;
             igniterState1 = (int)command.igniter1Fire;
             alarmState = (int)command.alarm;
@@ -196,8 +196,8 @@ int main(void) {
         data.solenoidInternalStateMvasVent = (bool)solenoidState4;
         data.solenoidInternalStateMvasOpen = (bool)solenoidState5;
         data.solenoidInternalStateMvasClose = (bool)solenoidState6;
-        data.solenoidInternalStateLoxVent = !(bool)solenoidState7;
-        data.solenoidInternalStateLngVent = !(bool)solenoidState8;
+        data.solenoidInternalStateLoxVent = (bool)solenoidState7;
+        data.solenoidInternalStateLngVent = (bool)solenoidState8;
         data.igniterInternalState0 = (bool)igniterState0;
         data.igniterInternalState1 = (bool)igniterState1;
         data.alarmInternalState = (bool)alarmState;
@@ -241,7 +241,7 @@ int main(void) {
             *(((uint32_t *)&rawData) + i) += data;
         }
 
-        data.pressureGn2 = 0.00128 * (float)rawData.pt0 / 5.0f * 5000.0f;   // PT0 -> GN2 (5000 PSI)
+        data.pressureGn2 = 0.00128 * (float)rawData.pt0;                    // PT0 -> GN2 (5000 PSI)
         (void)(0.00128f * (float)rawData.pt1);                              // UNUSED
         (void)(0.00128f * (float)rawData.pt2);                              // UNUSED
         (void)(0.00128f * (float)rawData.pt3);                              // UNUSED
@@ -300,8 +300,8 @@ int main(void) {
                 (int)data.solenoidInternalStateGn2Disconnect, (int)(data.solenoidCurrentGn2Disconnect * 1000), (int)data.solenoidInternalStateMvasFill, (int)(data.solenoidCurrentMvasFill * 1000),
                 (int)data.solenoidInternalStateMvasVent, (int)(data.solenoidCurrentMvasVent * 1000), (int)data.solenoidInternalStateMvasOpen, (int)(data.solenoidCurrentMvasOpen * 1000),
                 (int)data.solenoidInternalStateMvasClose, (int)(data.solenoidCurrentMvasClose * 1000), (int)data.solenoidInternalStateLoxVent, (int)(data.solenoidCurrentLoxVent * 1000),
-                (int)data.solenoidInternalStateLngVent, (int)(data.solenoidCurrentLngVent * 1000), (int)data.supplyVoltage0, (int)data.supplyVoltage1, (int)data.pressureGn2, (int)data.temperatureLox,
-                (int)data.temperatureLng, (int)data.alarmInternalState);
+                (int)data.solenoidInternalStateLngVent, (int)(data.solenoidCurrentLngVent * 1000), (int)data.supplyVoltage0, (int)data.supplyVoltage1, (int)(data.pressureGn2 * 1000),
+                (int)data.temperatureLox, (int)data.temperatureLng, (int)data.alarmInternalState);
         CDC_Transmit_FS((uint8_t *)buffer, strlen(buffer));
 
         // ethernet
