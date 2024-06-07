@@ -33,12 +33,12 @@ struct GseCommand {
     bool alarm;
     bool solenoidStateGn2Fill;
     bool solenoidStateGn2Vent;
+    bool solenoidStateGn2Disconnect;
     bool solenoidStateMvasFill;
     bool solenoidStateMvasVent;
-    bool solenoidStateMvas;
-    bool solenoidStateLoxFill;
+    bool solenoidStateMvasOpen;
+    bool solenoidStateMvasClose;
     bool solenoidStateLoxVent;
-    bool solenoidStateLngFill;
     bool solenoidStateLngVent;
     uint32_t crc;
 };
@@ -53,23 +53,23 @@ struct GseData {
     bool alarmInternalState;
     bool solenoidInternalStateGn2Fill;
     bool solenoidInternalStateGn2Vent;
+    bool solenoidInternalStateGn2Disconnect;
     bool solenoidInternalStateMvasFill;
     bool solenoidInternalStateMvasVent;
-    bool solenoidInternalStateMvas;
-    bool solenoidInternalStateLoxFill;
+    bool solenoidInternalStateMvasOpen;
+    bool solenoidInternalStateMvasClose;
     bool solenoidInternalStateLoxVent;
-    bool solenoidInternalStateLngFill;
     bool solenoidInternalStateLngVent;
     float supplyVoltage0 = std::nanf("");
     float supplyVoltage1 = std::nanf("");
     float solenoidCurrentGn2Fill = std::nanf("");
     float solenoidCurrentGn2Vent = std::nanf("");
+    float solenoidCurrentGn2Disconnect = std::nanf("");
     float solenoidCurrentMvasFill = std::nanf("");
     float solenoidCurrentMvasVent = std::nanf("");
-    float solenoidCurrentMvas = std::nanf("");
-    float solenoidCurrentLoxFill = std::nanf("");
+    float solenoidCurrentMvasOpen = std::nanf("");
+    float solenoidCurrentMvasClose = std::nanf("");
     float solenoidCurrentLoxVent = std::nanf("");
-    float solenoidCurrentLngFill = std::nanf("");
     float solenoidCurrentLngVent = std::nanf("");
     float temperatureLox = std::nanf("");
     float temperatureLng = std::nanf("");
@@ -176,12 +176,12 @@ int main(void) {
 
             solenoidState0 = (int)(command.solenoidStateGn2Fill);
             solenoidState1 = (int)(command.solenoidStateGn2Vent);
-            solenoidState2 = (int)(command.solenoidStateMvasFill);
-            solenoidState3 = (int)(command.solenoidStateMvasVent);
-            solenoidState4 = (int)(command.solenoidStateMvas);
-            solenoidState5 = (int)(command.solenoidStateLoxFill);
-            solenoidState6 = (int)(!command.solenoidStateLoxVent);
-            solenoidState7 = (int)(command.solenoidStateLngFill);
+            solenoidState2 = (int)(command.solenoidStateGn2Disconnect);
+            solenoidState3 = (int)(command.solenoidStateMvasFill);
+            solenoidState4 = (int)(command.solenoidStateMvasVent);
+            solenoidState5 = (int)(command.solenoidStateMvasOpen);
+            solenoidState6 = (int)(command.solenoidStateMvasClose);
+            solenoidState7 = (int)(!command.solenoidStateLoxVent);
             solenoidState8 = (int)(!command.solenoidStateLngVent);
             igniterState0 = (int)command.igniter0Fire;
             igniterState1 = (int)command.igniter1Fire;
@@ -191,12 +191,12 @@ int main(void) {
         // internal states feedback
         data.solenoidInternalStateGn2Fill = (bool)solenoidState0;
         data.solenoidInternalStateGn2Vent = (bool)solenoidState1;
-        data.solenoidInternalStateMvasFill = (bool)solenoidState2;
-        data.solenoidInternalStateMvasVent = (bool)solenoidState3;
-        data.solenoidInternalStateMvas = (bool)solenoidState4;
-        data.solenoidInternalStateLoxFill = (bool)solenoidState5;
-        data.solenoidInternalStateLoxVent = !(bool)solenoidState6;
-        data.solenoidInternalStateLngFill = (bool)solenoidState7;
+        data.solenoidInternalStateGn2Disconnect = (bool)solenoidState2;
+        data.solenoidInternalStateMvasFill = (bool)solenoidState3;
+        data.solenoidInternalStateMvasVent = (bool)solenoidState4;
+        data.solenoidInternalStateMvasOpen = (bool)solenoidState5;
+        data.solenoidInternalStateMvasClose = (bool)solenoidState6;
+        data.solenoidInternalStateLoxVent = !(bool)solenoidState7;
         data.solenoidInternalStateLngVent = !(bool)solenoidState8;
         data.igniterInternalState0 = (bool)igniterState0;
         data.igniterInternalState1 = (bool)igniterState1;
@@ -241,20 +241,20 @@ int main(void) {
             *(((uint32_t *)&rawData) + i) += data;
         }
 
-        data.pressureGn2 = 0.00128 * (float)rawData.pt0 / 5.0f * 5000.0f;  // PT0 -> GN2 (5000 PSI)
-        (void)(0.00128f * (float)rawData.pt1);                             // UNUSED
-        (void)(0.00128f * (float)rawData.pt2);                             // UNUSED
-        (void)(0.00128f * (float)rawData.pt3);                             // UNUSED
-        (void)(0.00128f * (float)rawData.pt4);                             // UNUSED
-        data.solenoidCurrentGn2Fill = 0.000817f * (float)rawData.s0;       // S0 -> GN2 Fill
-        data.solenoidCurrentGn2Vent = 0.000817f * (float)rawData.s1;       // S1 -> GN2 Vent
-        data.solenoidCurrentMvasFill = 0.000817f * (float)rawData.s2;      // S2 -> MVAS Fill
-        data.solenoidCurrentMvasVent = 0.000817f * (float)rawData.s3;      // S3 -> MVAS Vent
-        data.solenoidCurrentMvas = 0.000817f * (float)rawData.s4;          // S4 -> MVAS
-        data.solenoidCurrentLoxFill = 0.000817f * (float)rawData.s5;       // S5 -> LOX Fill
-        data.solenoidCurrentLoxVent = 0.000817f * (float)rawData.s6;       // S6 -> LOX Vent
-        data.solenoidCurrentLngFill = 0.000817f * (float)rawData.s7;       // S7 -> LNG Fill
-        data.solenoidCurrentLngVent = 0.000817f * (float)rawData.s8;       // S8 -> LNG Vent
+        data.pressureGn2 = 0.00128 * (float)rawData.pt0 / 5.0f * 5000.0f;   // PT0 -> GN2 (5000 PSI)
+        (void)(0.00128f * (float)rawData.pt1);                              // UNUSED
+        (void)(0.00128f * (float)rawData.pt2);                              // UNUSED
+        (void)(0.00128f * (float)rawData.pt3);                              // UNUSED
+        (void)(0.00128f * (float)rawData.pt4);                              // UNUSED
+        data.solenoidCurrentGn2Fill = 0.000817f * (float)rawData.s0;        // S0 -> GN2 Fill
+        data.solenoidCurrentGn2Vent = 0.000817f * (float)rawData.s1;        // S1 -> GN2 Vent
+        data.solenoidCurrentGn2Disconnect = 0.000817f * (float)rawData.s2;  // S2 -> GN2 QD
+        data.solenoidCurrentMvasFill = 0.000817f * (float)rawData.s3;       // S3 -> MVAS Fill
+        data.solenoidCurrentMvasVent = 0.000817f * (float)rawData.s4;       // S4 -> MVAS Vent
+        data.solenoidCurrentMvasOpen = 0.000817f * (float)rawData.s5;       // S5 -> MVAS Open
+        data.solenoidCurrentMvasClose = 0.000817f * (float)rawData.s6;      // S6 -> MVAS Close
+        data.solenoidCurrentLoxVent = 0.000817f * (float)rawData.s7;        // S7 -> LOX Vent
+        data.solenoidCurrentLngVent = 0.000817f * (float)rawData.s8;        // S8 -> LNG Vent
         data.supplyVoltage0 = 0.0062f * (float)rawData.pwr0 + 0.435f;
         data.supplyVoltage1 = 0.0062f * (float)rawData.pwr1 + 0.435f;
 
@@ -288,8 +288,8 @@ int main(void) {
                 "(G)Igniter 1 Fire: %d  (H)Igniter 2 Fire: %d\r\n"
                 "\r\n"
                 "SOLENOID\r\n"
-                "(1)GN2 Fill: %d-%04d  (2)GN2 Vent: %d-%04d  (3)MVAS Fill: %d-%04d  (4)MVAS Vent: %d-%04d  (5)MVAS: %d-%04d  "
-                "(6)LOX Fill: %d-%04d  (7)LOX Vent: %d-%04d  (8)LNG Fill: %d-%04d  (9)LNG Vent: %d-%04d\r\n"
+                "(1)GN2 Fill: %d-%04d  (2)GN2 Vent: %d-%04d  (3)GN2 QD: %d-%04d  (4)MVAS Fill: %d-%04d  (5)MVAS Vent: %d-%04d  "
+                "(6)MVAS Open: %d-%04d  (7)MVAS Close: %d-%04d  (8)LOX Vent: %d-%04d  (9)LNG Vent: %d-%04d\r\n"
                 "\r\n"
                 "PRESSURE & TEMPERATURE & VOLTAGE\r\n"
                 "Supply 0: %02d  Supply 1: %02d  GN2 Pressure: %04d  LOX Temperature: %03d  LNG Temperature: %03d\r\n"
@@ -297,9 +297,9 @@ int main(void) {
                 "---------------------\r\n",
                 (unsigned int)data.timestamp, (int)data.igniterArmed, (int)data.igniter0Continuity, (int)data.igniter1Continuity, (int)data.igniterInternalState0, (int)data.igniterInternalState1,
                 (int)data.solenoidInternalStateGn2Fill, (int)(data.solenoidCurrentGn2Fill * 1000), (int)data.solenoidInternalStateGn2Vent, (int)(data.solenoidCurrentGn2Vent * 1000),
-                (int)data.solenoidInternalStateMvasFill, (int)(data.solenoidCurrentMvasFill * 1000), (int)data.solenoidInternalStateMvasVent, (int)(data.solenoidCurrentMvasVent * 1000),
-                (int)data.solenoidInternalStateMvas, (int)(data.solenoidCurrentMvas * 1000), (int)data.solenoidInternalStateLoxFill, (int)(data.solenoidCurrentLoxFill * 1000),
-                (int)data.solenoidInternalStateLoxVent, (int)(data.solenoidCurrentLoxVent * 1000), (int)data.solenoidInternalStateLngFill, (int)(data.solenoidCurrentLngFill * 1000),
+                (int)data.solenoidInternalStateGn2Disconnect, (int)(data.solenoidCurrentGn2Disconnect * 1000), (int)data.solenoidInternalStateMvasFill, (int)(data.solenoidCurrentMvasFill * 1000),
+                (int)data.solenoidInternalStateMvasVent, (int)(data.solenoidCurrentMvasVent * 1000), (int)data.solenoidInternalStateMvasOpen, (int)(data.solenoidCurrentMvasOpen * 1000),
+                (int)data.solenoidInternalStateMvasClose, (int)(data.solenoidCurrentMvasClose * 1000), (int)data.solenoidInternalStateLoxVent, (int)(data.solenoidCurrentLoxVent * 1000),
                 (int)data.solenoidInternalStateLngVent, (int)(data.solenoidCurrentLngVent * 1000), (int)data.supplyVoltage0, (int)data.supplyVoltage1, (int)data.pressureGn2, (int)data.temperatureLox,
                 (int)data.temperatureLng, (int)data.alarmInternalState);
         CDC_Transmit_FS((uint8_t *)buffer, strlen(buffer));
