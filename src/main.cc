@@ -74,6 +74,7 @@ struct GseData {
     float temperatureLox = std::nanf("");
     float temperatureLng = std::nanf("");
     float pressureGn2 = std::nanf("");
+    float pressureChamber = std::nanf("");
     uint32_t crc;
 };
 #pragma pack(pop)
@@ -164,6 +165,8 @@ int main(void) {
 
     HAL_UART_Receive_IT(&huart3, commandBuffer, sizeof(GseCommand));
 
+    uint32_t usbBufferTimer = TIM5->CNT << 16 | TIM4->CNT;
+
     while (1) {
         GseData data;
 
@@ -242,7 +245,7 @@ int main(void) {
         }
 
         data.pressureGn2 = 0.00128 * (float)rawData.pt0;                    // PT0 -> GN2 (5000 PSI)
-        (void)(0.00128f * (float)rawData.pt1);                              // UNUSED
+        data.pressureChamber = (0.00128f * (float)rawData.pt1);             // PT1 ->
         (void)(0.00128f * (float)rawData.pt2);                              // UNUSED
         (void)(0.00128f * (float)rawData.pt3);                              // UNUSED
         (void)(0.00128f * (float)rawData.pt4);                              // UNUSED
@@ -281,7 +284,9 @@ int main(void) {
 
         // USB
         char buffer[1024] = {0};
-        sprintf(buffer,
+        if(data.timestamp - usbBufferTimer > 500)
+        {
+            sprintf(buffer,
                 "Timestamp: %08X\r\n"
                 "IGNITER\r\n"
                 "Armed: %d  Igniter 0 Continuity: %d  Igniter 1 Continuity: %d\r\n"
@@ -302,7 +307,11 @@ int main(void) {
                 (int)data.solenoidInternalStateMvasClose, (int)(data.solenoidCurrentMvasClose * 1000), (int)data.solenoidInternalStateLoxVent, (int)(data.solenoidCurrentLoxVent * 1000),
                 (int)data.solenoidInternalStateLngVent, (int)(data.solenoidCurrentLngVent * 1000), (int)data.supplyVoltage0, (int)data.supplyVoltage1, (int)(data.pressureGn2 * 1000),
                 (int)data.temperatureLox, (int)data.temperatureLng, (int)data.alarmInternalState);
-        CDC_Transmit_FS((uint8_t *)buffer, strlen(buffer));
+            CDC_Transmit_FS((uint8_t *)buffer, strlen(buffer));
+
+            //update buffer timer
+            usbBufferTimer = data.timestamp;
+        }
 
         // ethernet
         uint32_t crc = Crc32((uint8_t *)&data, sizeof(GseData) - 4);
