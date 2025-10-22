@@ -75,6 +75,8 @@ struct GseData {
     float temperatureLng = std::nanf("");
     float pressureGn2 = std::nanf("");
     float pressureChamber = std::nanf("");
+    float pressureLoxInjTee = std::nanf("");
+    float pressureLoxMvas = std::nanf("");
     uint32_t crc;
 };
 #pragma pack(pop)
@@ -245,9 +247,9 @@ int main(void) {
         }
 
         data.pressureGn2 = 0.00128 * (float)rawData.pt0;                    // PT0 -> GN2 (5000 PSI)
-        data.pressureChamber = (0.00128f * (float)rawData.pt1);             // PT1 ->
-        (void)(0.00128f * (float)rawData.pt2);                              // UNUSED
-        (void)(0.00128f * (float)rawData.pt3);                              // UNUSED
+        data.pressureChamber = 0.00128 * (float)rawData.pt1;                // PT1 -> Chamber/Vent pressure
+        data.pressureLoxInjTee =  0.00128 * (float)rawData.pt2;             // PT2 -> LOX pressure at the Tee
+        data.pressureLoxMvas = 0.00128 * (float)rawData.pt3;                // PT3 -> LOX pressure at MVAS
         (void)(0.00128f * (float)rawData.pt4);                              // UNUSED
         data.solenoidCurrentGn2Fill = 0.000817f * (float)rawData.s0;        // S0 -> GN2 Fill
         data.solenoidCurrentGn2Vent = 0.000817f * (float)rawData.s1;        // S1 -> GN2 Vent
@@ -284,7 +286,7 @@ int main(void) {
 
         // USB
         char buffer[1024] = {0};
-        if(data.timestamp - usbBufferTimer > 500)
+        // if(data.timestamp - usbBufferTimer > 500)
         {
             sprintf(buffer,
                 "Timestamp: %08X\r\n"
@@ -297,7 +299,9 @@ int main(void) {
                 "(6)MVAS Open: %d-%04d  (7)MVAS Close: %d-%04d  (8)LOX Vent: %d-%04d  (9)LNG Vent: %d-%04d\r\n"
                 "\r\n"
                 "PRESSURE & TEMPERATURE & VOLTAGE\r\n"
-                "Supply 0: %02d  Supply 1: %02d  GN2 Pressure: %04d  LOX Temperature: %03d  LNG Temperature: %03d\r\n"
+                "Supply 0: %02d  Supply 1: %02d \r\n"
+                "GN2 Pressure: %04d  Chamber/Vent Pressure: %04d LOX Injector Tee Pressure %04d LOX MVAS Pressure %04d \r\n"
+                "LOX Temperature: %03d  LNG Temperature: %03d\r\n"
                 "(A)Alarm: %d\r\n"
                 "---------------------\r\n",
                 (unsigned int)data.timestamp, (int)data.igniterArmed, (int)data.igniter0Continuity, (int)data.igniter1Continuity, (int)data.igniterInternalState0, (int)data.igniterInternalState1,
@@ -305,7 +309,8 @@ int main(void) {
                 (int)data.solenoidInternalStateGn2Disconnect, (int)(data.solenoidCurrentGn2Disconnect * 1000), (int)data.solenoidInternalStateMvasFill, (int)(data.solenoidCurrentMvasFill * 1000),
                 (int)data.solenoidInternalStateMvasVent, (int)(data.solenoidCurrentMvasVent * 1000), (int)data.solenoidInternalStateMvasOpen, (int)(data.solenoidCurrentMvasOpen * 1000),
                 (int)data.solenoidInternalStateMvasClose, (int)(data.solenoidCurrentMvasClose * 1000), (int)data.solenoidInternalStateLoxVent, (int)(data.solenoidCurrentLoxVent * 1000),
-                (int)data.solenoidInternalStateLngVent, (int)(data.solenoidCurrentLngVent * 1000), (int)data.supplyVoltage0, (int)data.supplyVoltage1, (int)(data.pressureGn2 * 1000),
+                (int)data.solenoidInternalStateLngVent, (int)(data.solenoidCurrentLngVent * 1000), (int)data.supplyVoltage0, (int)data.supplyVoltage1, 
+                (int)(data.pressureGn2 * 1000), (int)(data.pressureChamber * 1000), (int)(data.pressureLoxInjTee * 1000), (int)(data.pressureLoxMvas * 1000), 
                 (int)data.temperatureLox, (int)data.temperatureLng, (int)data.alarmInternalState);
             CDC_Transmit_FS((uint8_t *)buffer, strlen(buffer));
 
