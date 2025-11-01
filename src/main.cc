@@ -74,8 +74,8 @@ struct GseData {
     float temperatureLox = std::nanf("");
     float temperatureLng = std::nanf("");
     float pressureGn2 = std::nanf("");
-    float pressureChamber = std::nanf("");
     float pressureLoxInjTee = std::nanf("");
+    float pressureVent = std::nanf("");
     float pressureLoxMvas = std::nanf("");
     uint32_t crc;
 };
@@ -247,8 +247,8 @@ int main(void) {
         }
 
         data.pressureGn2 = 0.00128 * (float)rawData.pt0;                    // PT0 -> GN2 (5000 PSI)
-        data.pressureChamber = 0.00128 * (float)rawData.pt1;                // PT1 -> Chamber/Vent pressure
-        data.pressureLoxInjTee =  0.00128 * (float)rawData.pt2;             // PT2 -> LOX pressure at the Tee
+        data.pressureLoxInjTee =  0.00128 * (float)rawData.pt1;             // PT1 -> LOX pressure at the Tee
+        data.pressureVent = 0.00128 * (float)rawData.pt2;                   // PT2 -> Chamber/Vent pressure
         data.pressureLoxMvas = 0.00128 * (float)rawData.pt3;                // PT3 -> LOX pressure at MVAS
         (void)(0.00128f * (float)rawData.pt4);                              // UNUSED
         data.solenoidCurrentGn2Fill = 0.000817f * (float)rawData.s0;        // S0 -> GN2 Fill
@@ -310,7 +310,7 @@ int main(void) {
                 (int)data.solenoidInternalStateMvasVent, (int)(data.solenoidCurrentMvasVent * 1000), (int)data.solenoidInternalStateMvasOpen, (int)(data.solenoidCurrentMvasOpen * 1000),
                 (int)data.solenoidInternalStateMvasClose, (int)(data.solenoidCurrentMvasClose * 1000), (int)data.solenoidInternalStateLoxVent, (int)(data.solenoidCurrentLoxVent * 1000),
                 (int)data.solenoidInternalStateLngVent, (int)(data.solenoidCurrentLngVent * 1000), (int)data.supplyVoltage0, (int)data.supplyVoltage1, 
-                (int)(data.pressureGn2 * 1000), (int)(data.pressureChamber * 1000), (int)(data.pressureLoxInjTee * 1000), (int)(data.pressureLoxMvas * 1000), 
+                (int)(data.pressureGn2 * 1000), (int)(data.pressureLoxInjTee * 1000), (int)(data.pressureVent * 1000), (int)(data.pressureLoxMvas * 1000), 
                 (int)data.temperatureLox, (int)data.temperatureLng, (int)data.alarmInternalState);
             CDC_Transmit_FS((uint8_t *)buffer, strlen(buffer));
 
