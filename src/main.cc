@@ -247,10 +247,10 @@ int main(void) {
         }
 
         data.pressureGn2 = 0.00128 * (float)rawData.pt0;                    // PT0 -> GN2 (5000 PSI)
-        data.pressureLoxInjTee =  0.00128 * (float)rawData.pt1;             // PT1 -> LOX pressure at the Tee
+        (void) (0.00128 * (float)rawData.pt1);                                // UNUSED
         data.pressureVent = 0.00128 * (float)rawData.pt2;                   // PT2 -> Chamber/Vent pressure
         data.pressureLoxMvas = 0.00128 * (float)rawData.pt3;                // PT3 -> LOX pressure at MVAS
-        (void)(0.00128f * (float)rawData.pt4);                              // UNUSED
+        data.pressureLoxInjTee = (0.00128f * (float)rawData.pt4);     // PT4 -> LOX pressure at the Tee
         data.solenoidCurrentGn2Fill = 0.000817f * (float)rawData.s0;        // S0 -> GN2 Fill
         data.solenoidCurrentGn2Vent = 0.000817f * (float)rawData.s1;        // S1 -> GN2 Vent
         data.solenoidCurrentGn2Disconnect = 0.000817f * (float)rawData.s2;  // S2 -> GN2 QD
